@@ -3,23 +3,31 @@
 
 using namespace std;
 
-void display(my_vector<int>& vec){
+template <typename typ>
+void display(my_vector<typ>& vec){
     cout << vec.capacity() << "/" << vec.size();
     cout << "=[ ";
     for (int i = 0; i < vec.size(); i++)
     {
         if(i!=0)
             cout << ", ";
-        cout << vec[i];
+        cout << vec[i].j;
     }
     cout << " ]" << endl;
 }
 
-int main() {
-    my_vector<int> vec;
+struct data
+{
+    int i = 0;
+    int j = 0;
+};
 
-    vec << 1 << 2 << 3;
-    20 << 10 << vec;            // I want this work as [ 20, 10, 1, 2, 3 ]
+int main() {
+    my_vector<data> vec;
+
+    vec << (data){1} << (data){2,0} << (data){3,0};
+    vec << vec;
+    vec <<= 1;
 
     display(vec);
 }

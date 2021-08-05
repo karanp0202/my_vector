@@ -11,6 +11,7 @@ public:
     my_vector();
     my_vector(unsigned long);
 
+    void clear();
     void pop_back();
     void pop_begin();
     void fit_to_size();
@@ -110,8 +111,13 @@ my_vector<typ>& my_vector<typ>::operator<<(typ data){
 
 template <typename typ>
 my_vector<typ>& my_vector<typ>::operator<<(my_vector<typ>& vec){
+    my_vector<typ> tmp;
+
     for (unsigned long i = 0; i < vec.size(); i++)
-        this->operator<<(vec[i]);
+        tmp << vec[i];
+
+    for (unsigned long i = 0; i < tmp.size(); i++)
+        this->operator<<(tmp[i]);
 
     return *this;
 }
@@ -156,6 +162,14 @@ my_vector<typ>& my_vector<typ>::part(unsigned long start, unsigned long end){
         *tmp << this->_data[i];
 
     return *tmp;
+}
+
+template <typename typ>
+void my_vector<typ>::clear(){
+    delete[] _data;
+    _data = new typ;
+    this->size() = 0;
+    this->capacity() = 1;
 }
 
 template <typename typ>
