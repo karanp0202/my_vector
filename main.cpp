@@ -15,16 +15,11 @@ void display(my_vector<int>& vec){
     cout << " ]" << endl;
 }
 
-int main(){
+int main() {
     my_vector<int> vec;
 
-    vec > 10 > 20 > 30 > 40 > 50 > 60 < 55;
+    vec << 1 << 2 << 3;
+    20 << 10 << vec;            // I want this work as [ 20, 10, 1, 2, 3 ]
 
     display(vec);
-
-    my_vector<int> vec2 = vec.part(2,3) > 55;
-
-    vec2 << 2;
-
-    display(vec2);
 }

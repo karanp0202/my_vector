@@ -5,6 +5,7 @@ private:
     typ *_data;
     unsigned long _size;
     unsigned long _capacity;
+    my_vector& at_begin(typ);
 
 public:
     my_vector();
@@ -16,121 +17,132 @@ public:
     typ& operator[](unsigned long);
     void operator+=(unsigned long);
     void operator-=(unsigned long);
-    unsigned long& size();
     my_vector& reverse();
     my_vector &part(unsigned long, unsigned long);
-    my_vector &operator>(typ);
-    my_vector& operator<(typ);
-    my_vector& operator>>(int);
-    my_vector& operator<<(int);
+    my_vector &operator<<(typ);
+    my_vector &operator<<(my_vector<typ>&);
+    my_vector& operator>>=(int);
+    my_vector& operator<<=(int);
     unsigned long& capacity();
+    unsigned long& size();
+
+    template <typename typ2>
+    friend my_vector<typ2>& operator<<(typ2, my_vector<typ2>&);
 };
 
 template <typename typ>
 my_vector<typ>::my_vector(){
-    _data = new typ;
-    _size = 0;
-    _capacity = 1;
+    this->_data = new typ;
+    this->_size = 0;
+    this->_capacity = 1;
 }
 
 template <typename typ>
 my_vector<typ>::my_vector(unsigned long count) : my_vector(){
-    operator+=(count);
+    this->operator+=(count);
 }
 
 template <typename typ>
 typ& my_vector<typ>::operator[](unsigned long pos){
-    return _data[pos];
+    return this->_data[pos];
 }
 
 template <typename typ>
 void my_vector<typ>::operator+=(unsigned long count){
     for (int i = 0; i < count; i++)
-        operator>(typ());
+        this->operator<<(typ());
 }
 
 template <typename typ>
 void my_vector<typ>::operator-=(unsigned long count){
     for (int i = 0; i < count; i++)
-        pop_back();
+        this->pop_back();
 }
 
 template <typename typ>
-my_vector<typ>& my_vector<typ>::operator<<(int count){
-    if(size() == 0)
+my_vector<typ>& my_vector<typ>::operator<<=(int count){
+    if(this->size() == 0)
         return *this;
     for (int i = 0; i < count; i++)
     {
-        typ tmp = _data[0];
-        for (int j = 0; j < size()-1; j++)
-            _data[j] = _data[j + 1];
-        _data[size() - 1] = tmp;
+        typ tmp = this->_data[0];
+        for (int j = 0; j <this->size()-1; j++)
+            this->_data[j] = this->_data[j + 1];
+        this->_data[this->size() - 1] = tmp;
     }
 
     return *this;
 }
 
 template <typename typ>
-my_vector<typ>& my_vector<typ>::operator>>(int count){
-    if(size() == 0)
+my_vector<typ>& my_vector<typ>::operator>>=(int count){
+    if(this->size() == 0)
         return *this;
     for (int i = 0; i < count; i++)
     {
-        typ tmp = _data[size()-1];
-        for (int j = size() - 1; j > 1; j--)
-            _data[j] = _data[j - 1];
-        _data[0] = tmp;
+        typ tmp = this->_data[this->size()-1];
+        for (int j =this->size() - 1; j > 1; j--)
+            this->_data[j] = this->_data[j - 1];
+        this->_data[0] = tmp;
     }
 
     return *this;
 }
 
 template <typename typ>
-my_vector<typ>& my_vector<typ>::operator>(typ data){
-    if(size() == capacity()){
-        capacity() *= 2;
+my_vector<typ>& my_vector<typ>::operator<<(typ data){
+    if(this->size() ==this->capacity()){
+       this->capacity() *= 2;
 
-        typ *tmp = _data;
-        _data = new typ[capacity()];
+        typ *tmp = this->_data;
+        this->_data = new typ[this->capacity()];
 
-        for (unsigned long i = 0; i < size(); i++)
-            _data[i] = tmp[i];
+        for (unsigned long i = 0; i <this->size(); i++)
+            this->_data[i] = tmp[i];
         delete[] tmp;
     }
     
-    _data[size()] = data;
-    size()++;
+    this->_data[this->size()] = data;
+    this->size()++;
 
     return *this;
 }
 
 template <typename typ>
-my_vector<typ>& my_vector<typ>::operator<(typ data){
-    if(size() == capacity())
-        capacity() *= 2;
+my_vector<typ>& my_vector<typ>::operator<<(my_vector<typ>& vec){
+    for (unsigned long i = 0; i < vec.size(); i++)
+        this->operator<<(vec[i]);
 
-    typ *tmp = _data;
-    _data = new typ[capacity()];
+    return *this;
+}
 
-    for (unsigned long i = 0; i < size(); i++)
-        _data[i+1] = tmp[i];
+template <typename typ>
+my_vector<typ>& my_vector<typ>::at_begin(typ data){
+    if(this->size() ==this->capacity())
+       this->capacity() *= 2;
+
+    typ *tmp = this->_data;
+    this->_data = new typ[this->capacity()];
+
+    for (unsigned long i = 0; i <this->size(); i++)
+        this->_data[i+1] = tmp[i];
     delete[] tmp;
 
-    _data[0] = data;
-    size()++;
+    this->_data[0] = data;
+    this->size()++;
 
     return *this;
 }
 
 template <typename typ>
 my_vector<typ>& my_vector<typ>::reverse(){
-    typ *rev = new typ[capacity()];
+    typ *rev = new typ[this->capacity()];
 
-    for (int i = 0; i < size(); i++)
-        rev[i] = _data[size() - i - 1];
+    for (int i = 0; i <this->size(); i++)
+        rev[i] = this->_data[this->size() - i - 1];
 
-    delete[] _data;
-    _data = rev;
+    delete[] this->_data;
+    this->_data = rev;
 
     return *this;
 }
@@ -138,54 +150,59 @@ my_vector<typ>& my_vector<typ>::reverse(){
 template <typename typ>
 my_vector<typ>& my_vector<typ>::part(unsigned long start, unsigned long end){
     my_vector<typ> *tmp = new my_vector<typ>;
-    if(start > size()-1)
+    if(start > this->size()-1)
         return *tmp;
-    for (unsigned long i = start; i <= end && i < size(); i++)
-        *tmp > _data[i];
+    for (unsigned long i = start; i <= end && i < this->size(); i++)
+        *tmp << this->_data[i];
 
     return *tmp;
 }
 
 template <typename typ>
 void my_vector<typ>::pop_back(){
-    if(size() == 0)
+    if(this->size() == 0)
         return;
     
-    size()--;
-    if(size() != 0)fit_to_size();
+    this->size()--;
+    if(this->size() != 0)this->fit_to_size();
 }
 
 template <typename typ>
 void my_vector<typ>::pop_begin(){
-    if(size() == 0)
+    if(this->size() == 0)
         return;
-    for (unsigned long i = 0; i < size() - 1; i++)
-        _data[i] = _data[i + 1];
+    for (unsigned long i = 0; i < this->size() - 1; i++)
+        this->_data[i] = this->_data[i + 1];
 
-    size()--;
-    if(size() != 0)fit_to_size();
+    this->size()--;
+    if(this->size() != 0)this->fit_to_size();
 }
 
 template <typename typ>
 void my_vector<typ>::fit_to_size(){
-    if(capacity() > size()*2){
-        capacity() /= 2;
-        typ *tmp = new typ[capacity()];
+    if(this->capacity() > this->size()*2){
+        this->capacity() /= 2;
+        typ *tmp = new typ[this->capacity()];
 
-        for (unsigned long i = 0; i < capacity(); i++){
-            tmp[i] = _data[i];
+        for (unsigned long i = 0; i < this->capacity(); i++){
+            tmp[i] = this->_data[i];
         }
-        delete[] _data;
-        _data = tmp;
+        delete[] this->_data;
+        this->_data = tmp;
     }
 }
 
 template <typename typ>
 unsigned long& my_vector<typ>::size(){
-    return _size;
+    return this->_size;
 }
 
 template <typename typ>
 unsigned long& my_vector<typ>::capacity(){
-    return _capacity;
+    return this->_capacity;
+}
+
+template <typename typ2>
+my_vector<typ2>& operator<< (typ2 data, my_vector<typ2>& vec){
+    return vec.at_begin(data);
 }
